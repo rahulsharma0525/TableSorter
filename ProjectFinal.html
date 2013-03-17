@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<script src="jquery.js"></script>
+<script src="sorttable.js"></script>
+<script type="text/javascript" src="jquery.tablescroll.js"></script>
+
+<script>
+
+
+
+$(document).ready(function(){
+
+var capsnames='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var snames ='abcdefghijklmnopqrstuvwxyz';
+var content
+var prevcol=999;
+//Generating the rows for the second table body along with random data
+for(i=0; i<200; i++){
+    content += '<tr>'
+	for(j=0;j<8;j++){
+		if(j==0 || j==1){
+		var names;
+			names=capsnames.charAt(1 + Math.floor(Math.random() * 24));
+		for(v=0;v<5;v++){
+			names+=snames.charAt(1 + Math.floor(Math.random() * 24));	
+		}
+		
+			if (j==1 ){
+				random=(1 + Math.floor(Math.random() * 2));
+				if(random==1){
+					names+='@gmail.com';
+				}
+				else if(random==2){
+					names+='@yahoo.com';
+				}
+			
+			}
+		content+='<td width =150px>'  + names + '</td>'
+		}
+		
+		else{
+		content+='<td width =150px>'  +  1 + Math.floor(Math.random() * 50) + '</td>'
+		}
+	}
+content+='</tr>';
+}
+
+$('tbody').append(content);
+
+//This is called when a column header is clicked
+$("th").click(function(){ 
+var col = $(this).parent().children().index($(this));
+rowcount=$("#sort tbody tr").length;
+prevcol=sorting(rowcount,col,prevcol);
+});
+
+function sorting(rowcount,col,prevcol){
+
+//call sortStrings for sortings the first two columns
+if(col==1 || col==0){
+prevcol=sortStrings(rowcount,col,prevcol);
+return prevcol;
+}
+
+//call sortStrings for sortings the other columns
+else
+{
+prevcol=sortNumbers(rowcount,col,prevcol);
+return prevcol;
+}
+}
+
+function sortStrings(rowcount,col,prevcol){
+t=document.getElementById('sort');
+var firstRow = t.getElementsByTagName('tr');
+
+//just reverse if the column is sorted once
+if (prevcol==col){
+reverse(rowcount,firstRow,col);
+}
+//apply selection sort
+else{
+var prevcol=col;
+for (i=0;i< rowcount-1;i++){
+		min=i;
+		for(j=i+1;j<rowcount;j++){
+			value1=firstRow[j].cells[col].innerHTML.toLowerCase();
+			value2=firstRow[min].cells[col].innerHTML.toLowerCase();
+			if ( value1 < value2 ){
+			min=j;
+			
+			}
+		}
+		if (min != i){
+		var temp=[];
+		for(j=0;j<8;j++){
+			temp[j]=firstRow[i].cells[j].innerHTML;
+		}
+		for(k=0;k<8;k++){
+		
+			firstRow[i].cells[k].innerHTML=firstRow[min].cells[k].innerHTML;
+			}
+		for(m=0;m<8;m++){
+				firstRow[min].cells[m].innerHTML=temp[m];
+		}
+	}
+
+}
+return prevcol;
+}
+}
+
+
+function sortNumbers(rowcount,col,prevcol){
+var sortedValues = [];
+var newRows=[];
+
+t=document.getElementById('sort');
+var firstRow = t.getElementsByTagName('tr');
+for(i=0;i<rowcount;i++){
+	var cell=firstRow[i].cells[col];
+	var value=cell.innerHTML;
+	sortedValues[i]=value;
+}
+if(prevcol==col){
+reverse(rowcount,firstRow,col);
+}
+else{
+prevcol=sSort(rowcount,sortedValues,firstRow,col,prevcol);
+return prevcol;
+}
+
+
+}
+ function reverse(rowcount,firstRow,col){
+var newRows=[];
+w=rowcount-1;
+for(i=0;i<rowcount;i++){
+
+newRows[w]=firstRow[i];
+w=w-1;
+}
+
+$("#sort tbody tr").remove(); 
+$('tbody').append(newRows);
+return;
+
+ 
+ }
+function sSort(rowcount,sortedValues,firstRow,col,prevcol){
+var i
+var j
+var min
+var temp;
+var newRows=[];
+
+prevcol=col;
+for (i=0;i< rowcount-1;i++){
+		min=i;
+		for(j=i+1;j<rowcount;j++){
+			if (parseInt(firstRow[j].cells[col].innerHTML) < parseInt(firstRow[min].cells[col].innerHTML)){
+					min=j;
+			}
+		}
+		if (min != i){
+		var temp=[];
+		for(j=0;j<8;j++){
+			temp[j]=firstRow[i].cells[j].innerHTML;
+		}
+		for(k=0;k<8;k++){
+			firstRow[i].cells[k].innerHTML=firstRow[min].cells[k].innerHTML;
+			}
+		for(m=0;m<8;m++){
+				firstRow[min].cells[m].innerHTML=temp[m];
+				
+		}
+	}
+
+}
+return prevcol;
+
+
+}
+});
+</script>
+<div>
+<table border=1 id="first" class="fixed" >
+<thead id="hfixed" >
+<tr id="info">
+<th width =150px >NAME</th>
+<th width =150px>EMAIL</th>
+<th width =150px>SCORE</th>
+<th width =150px>SCORE</th>
+<th width =150px>SCORE</th>
+<th width =150px>SCORE</th>
+<th width =150px>SCORE</th>
+<th width =150px>SCORE</th>
+</tr>
+</thead>
+</table>
+</div>
+<div class="scroll">
+<table border=1  id= "sort" class="sortable">
+
+
+<tbody id "fix">
+</tbody>
+</table >
+</div>
+
+<style>
+
+div.scroll
+{
+background-color:#00FFFF;
+width:1290px;
+height:600px;
+overflow:scroll;
+}
+
+
+table.fixed thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+}
+
+</style>
+
+</body>
+</html>
